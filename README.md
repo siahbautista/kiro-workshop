@@ -29,6 +29,7 @@ styles.css     styling + status indicators (complete)
 app.js         scanner logic — INTENTIONALLY INCOMPLETE (your work)
 hero.js        cursor-following ghost in the hero (decoration, complete)
 chart.js       fuel bars that pump up and count (decoration, complete)
+engine.js      rocket fire in the footer (decoration, complete)
 .kiro/
   steering/workshop.md               project rules Kiro should follow
   specs/destination-scanner/         the prepared feature spec

@@ -242,6 +242,28 @@ function animateEclipse(time) {
   requestAnimationFrame(animateEclipse);
 }
 
+// --- Looking around the cockpit ----------------------------------------
+
+// Moving the mouse is like leaning in your seat: styles.css uses these two
+// numbers to slide the view outside against the fixed windshield frame.
+const COCKPIT_LOOK_RANGE = 800;
+const COCKPIT_SMOOTHING = 0.07;
+
+let cockpitLookX = 0;
+let cockpitLookY = 0;
+
+function animateCockpitView() {
+  const wanted = directionToMouse(heroSection, COCKPIT_LOOK_RANGE);
+
+  cockpitLookX += (wanted.x - cockpitLookX) * COCKPIT_SMOOTHING;
+  cockpitLookY += (wanted.y - cockpitLookY) * COCKPIT_SMOOTHING;
+
+  heroSection.style.setProperty("--look-x", cockpitLookX.toFixed(4));
+  heroSection.style.setProperty("--look-y", cockpitLookY.toFixed(4));
+
+  requestAnimationFrame(animateCockpitView);
+}
+
 // --- Start everything --------------------------------------------------
 
 // People who ask for less motion keep a still logo and no moving ghost.
@@ -253,4 +275,5 @@ if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
   document.documentElement.addEventListener("pointerleave", forgetMouse);
   requestAnimationFrame(animateLogoGhost);
   requestAnimationFrame(animateEclipse);
+  requestAnimationFrame(animateCockpitView);
 }

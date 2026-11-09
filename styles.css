@@ -42,13 +42,17 @@ body {
   display: flex;
   align-items: flex-end;
   min-height: clamp(420px, 66vh, 560px);
-  padding: 5rem max(1.25rem, calc((100% - 980px) / 2 + 1.25rem)) 4rem;
+  padding: 5rem max(1.25rem, calc((100% - 980px) / 2 + 1.25rem)) 5.25rem;
 }
 
-/* Everything seen through the windshield */
+/* Everything seen through the windshield. It is 24px larger than the window
+   on every side, so moving it for parallax never shows an empty edge. */
 .hero-sky {
+  --sky-bleed: 24px;
   position: absolute;
-  inset: 0;
+  inset: calc(var(--sky-bleed) * -1);
+  transform: translate(calc(var(--look-x, 0) * -16px), calc(var(--look-y, 0) * -9px));
+  will-change: transform;
 }
 
 /* Drifting stars. Each layer is a repeating tile, one tile larger than the
@@ -108,6 +112,7 @@ body {
 .hero-star {
   position: absolute;
   --star-size: clamp(170px, 27vw, 440px);
+  margin: 0 var(--sky-bleed) var(--sky-bleed) 0; /* cancels the sky's extra size */
   right: 1.5%;
   bottom: calc(var(--star-size) * -0.22); /* sits partly below the horizon */
   width: var(--star-size);
@@ -314,9 +319,11 @@ body {
   }
 }
 
+/* The title is projected on the glass, so it shifts only slightly */
 .hero-copy {
   position: relative;
   isolation: isolate;
+  transform: translate(calc(var(--look-x, 0) * 5px), calc(var(--look-y, 0) * 3px));
 }
 
 /* A soft shadow behind the text, so comets and stars don't compete with it */
@@ -363,6 +370,7 @@ body {
 
 .hero-title {
   display: block;
+  text-shadow: 0 0 34px rgb(194 160 253 / 0.38);
   font-size: clamp(3.25rem, 15vw, 9.5rem);
   font-stretch: condensed;
   line-height: 0.9;
@@ -536,7 +544,7 @@ body {
 }
 
 .fuel-limit::before {
-  top: 3.35rem;
+  top: 3.45rem;
 }
 
 .destination-fuel::before {
@@ -545,12 +553,17 @@ body {
 
 .fuel-gauge {
   position: absolute;
-  top: 0.65rem;
+  top: 0.6rem;
   left: var(--fuel-limit);
   transform: translateX(-50%);
   display: flex;
   align-items: baseline;
   gap: 0.3rem;
+  padding: 0.05rem 0.55rem;
+  background: #100c17;
+  border: 1px solid rgb(194 160 253 / 0.4);
+  border-radius: 2px;
+  white-space: nowrap;
 }
 
 .fuel-value,
@@ -636,6 +649,7 @@ body {
 .planet {
   position: relative;
   flex: none;
+  outline: 4px solid #0c0912; /* the dark socket each planet sits in */
   width: 44px;
   height: 44px;
   border-radius: 50%;
@@ -1068,13 +1082,31 @@ body {
   pointer-events: none;
 }
 
+/* The glass itself: dark at the edges where it meets the frame, with one
+   faint diagonal reflection. Fixed to the ship, so it doesn't parallax. */
+.hull::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    112deg,
+    transparent 34%,
+    rgb(255 255 255 / 0.05) 39%,
+    rgb(255 255 255 / 0.02) 47%,
+    transparent 50%
+  );
+  box-shadow: inset 0 0 130px rgb(8 5 14 / 0.75);
+}
+
 .hull-pillar {
   position: absolute;
   top: 0;
   bottom: 0;
   left: 0;
   width: clamp(44px, 7vw, 130px);
-  background: linear-gradient(100deg, #120e19, #2b2438);
+  background:
+    repeating-linear-gradient(to bottom, transparent 0 86px, rgb(0 0 0 / 0.6) 86px 88px, rgb(255 255 255 / 0.05) 88px 89px),
+    linear-gradient(100deg, #120e19, #332b42);
   clip-path: polygon(0 0, 100% 0, 0 100%);
 }
 
@@ -1101,12 +1133,18 @@ body {
   display: flex;
   align-items: center;
   gap: 1.75rem;
-  height: 42px;
+  height: 48px;
   padding-inline: max(1.25rem, calc((100% - 980px) / 2 + 1.25rem));
   color: var(--muted);
   font-size: 0.85rem;
-  background: linear-gradient(180deg, #2b2438, #17121f);
+  /* Hull plates: a seam every 140px, with a bolt at each corner of a plate */
+  background:
+    radial-gradient(circle 1.5px at 9px 8px, rgb(255 255 255 / 0.28) 95%, transparent) 0 0 / 140px 100%,
+    radial-gradient(circle 1.5px at 9px 39px, rgb(255 255 255 / 0.28) 95%, transparent) 0 0 / 140px 100%,
+    linear-gradient(to right, rgb(0 0 0 / 0.55) 1px, transparent 1px) 0 0 / 140px 100%,
+    linear-gradient(180deg, #332b42, #17121f);
   border-bottom: 1px solid rgb(194 160 253 / 0.45);
+  box-shadow: 0 10px 24px rgb(8 5 14 / 0.6);
 }
 
 .led {
@@ -1157,12 +1195,81 @@ body {
 .console-lip {
   position: relative;
   z-index: 2;
-  height: 40px;
-  margin-top: -40px;
+  height: 62px;
+  margin-top: -62px;
+  /* From the top: lit rim, cooling vents, the light bar, then the two faces */
   background:
-    linear-gradient(rgb(194 160 253 / 0.55), rgb(194 160 253 / 0.55)) top / 100% 2px no-repeat,
-    linear-gradient(180deg, #2b2438, #17121f);
+    linear-gradient(rgb(194 160 253 / 0.6), rgb(194 160 253 / 0.6)) top / 100% 2px no-repeat,
+    repeating-linear-gradient(90deg, rgb(0 0 0 / 0.6) 0 3px, transparent 3px 8px) center 15px / min(34%, 320px) 16px no-repeat,
+    linear-gradient(90deg, transparent, var(--accent-text) 18% 82%, transparent) 0 44px / 100% 2px no-repeat,
+    linear-gradient(180deg, #3a3149 0, #241d30 44px, #120e19 46px, #17121f 100%);
   clip-path: polygon(5% 0, 95% 0, 100% 100%, 0 100%);
+}
+
+/* The dashboard casts a shadow onto the wall below it */
+.mission-bay::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto;
+  height: 46px;
+  background: linear-gradient(180deg, rgb(8 5 14 / 0.75), transparent);
+}
+
+/* Wide screens have empty wall beside the console, so it gets air vents */
+@media (min-width: 1320px) {
+  .mission-bay::after {
+    --slats: repeating-linear-gradient(to bottom, rgb(0 0 0 / 0.7) 0 4px, rgb(194 160 253 / 0.1) 4px 10px);
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background:
+      var(--slats) left 4% center / 92px 230px no-repeat,
+      var(--slats) right 4% center / 92px 230px no-repeat;
+  }
+}
+
+/* Status light built into the Scan key */
+.scan-button::before {
+  content: "";
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  margin-right: 0.55rem;
+  border-radius: 50%;
+  vertical-align: 0.08em;
+  background: var(--star-core);
+  box-shadow: 0 0 7px var(--star-core);
+}
+
+/* The fuel screen flickers awake the first time the chart comes into view */
+.is-powered .fuel-limit,
+.is-powered .destination-fuel {
+  animation: screen-wake 0.65s linear;
+}
+
+@keyframes screen-wake {
+  0% {
+    opacity: 0;
+    filter: brightness(2.4);
+  }
+  18% {
+    opacity: 0.9;
+  }
+  30% {
+    opacity: 0.25;
+  }
+  55% {
+    opacity: 1;
+    filter: brightness(1.5);
+  }
+  68% {
+    opacity: 0.7;
+  }
+  100% {
+    opacity: 1;
+    filter: brightness(1);
+  }
 }
 
 /* Lit corner brackets, the same marks a targeting display would use */
@@ -1223,6 +1330,61 @@ body {
   }
 }
 
+/* Footer: the tail of the ship, with the engines firing into open space */
+.engine-bay {
+  position: relative;
+  overflow: hidden;
+  height: clamp(320px, 46vh, 440px);
+  background: linear-gradient(180deg, #120d1c, #08060e);
+}
+
+.engine-fire {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+/* The ship narrows toward its tail */
+.engine-hull {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 52px;
+  background:
+    linear-gradient(90deg, transparent, var(--accent-text) 25% 75%, transparent) 0 40px / 100% 2px no-repeat,
+    linear-gradient(to right, rgb(0 0 0 / 0.55) 1px, transparent 1px) center / 140px 100%,
+    linear-gradient(180deg, #17121f, #332b42);
+  clip-path: polygon(0 0, 100% 0, 86% 100%, 14% 100%);
+}
+
+.nozzles {
+  position: absolute;
+  top: 40px;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  gap: clamp(1.5rem, 9vw, 8.5rem);
+}
+
+/* Bell-shaped engine: rounded shading across it, and a hot glowing rim */
+.nozzle {
+  width: clamp(54px, 8vw, 104px);
+  height: clamp(44px, 5.5vw, 66px);
+  background:
+    linear-gradient(0deg, var(--warn), var(--danger) 3%, transparent 16%),
+    linear-gradient(90deg, #0d0a14, #4a4158 45%, #0d0a14);
+  clip-path: polygon(24% 0, 76% 0, 100% 100%, 0 100%);
+}
+
+.nozzle-main {
+  width: clamp(76px, 11vw, 146px);
+  height: clamp(54px, 7vw, 84px);
+}
+
 /* The one row you can launch to gets a lit edge */
 .destination-card:has(.status-ok) {
   box-shadow: inset 3px 0 0 var(--ok), inset 0 1px 0 var(--panel-border);
@@ -1242,7 +1404,7 @@ body {
   }
 
   .hero-star {
-    top: 56px;
+    top: 82px; /* 58px below the canopy, plus the sky's extra 24px */
   }
 
   .hull-pillar,

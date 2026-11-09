@@ -64,6 +64,7 @@ if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
     (entries, watcher) => {
       if (entries[0].isIntersecting) {
         watcher.disconnect();
+        flightPlan.classList.add("is-powered"); // the screen flickers on in styles.css
         fillFuelBars();
       }
     },

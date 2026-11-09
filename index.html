@@ -208,8 +208,22 @@
   </main>
   </div>
 
+  <!-- The tail of the ship: three engines firing downward. engine.js draws the fire. -->
+  <footer class="engine-bay" aria-hidden="true">
+    <div class="drift-stars drift-stars-far"></div>
+    <div class="drift-stars drift-stars-near"></div>
+    <canvas class="engine-fire"></canvas>
+    <div class="nozzles">
+      <div class="nozzle"></div>
+      <div class="nozzle nozzle-main"></div>
+      <div class="nozzle"></div>
+    </div>
+    <div class="engine-hull"></div>
+  </footer>
+
   <script src="app.js"></script>
   <script src="hero.js"></script>
   <script src="chart.js"></script>
+  <script src="engine.js"></script>
 </body>
 </html>
