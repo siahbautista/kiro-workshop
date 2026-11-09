@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>KIROVERSE: The Last Shuttle — Destination Scanner</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="dashboard-header">
+    <h1>KIROVERSE · Shuttle Navigation Dashboard</h1>
+    <p class="subtitle">The Last Shuttle · Destination Scanner</p>
+  </header>
+
+  <main class="dashboard">
+    <!-- Fuel gauge -->
+    <section class="fuel-panel" aria-labelledby="fuel-heading">
+      <h2 id="fuel-heading">Fuel Reserves</h2>
+      <div class="fuel-gauge">
+        <span class="fuel-value" id="fuel-value">40</span>
+        <span class="fuel-unit">units</span>
+      </div>
+      <p class="fuel-note">Available fuel for this launch window.</p>
+    </section>
+
+    <!-- Scan control -->
+    <section class="scan-panel">
+      <button id="scan-button" class="scan-button" type="button">
+        Scan destinations
+      </button>
+      <p id="scan-hint" class="scan-hint">
+        Scan to evaluate each destination against current fuel reserves.
+      </p>
+    </section>
+
+    <!-- Destination cards -->
+    <section class="destinations" aria-label="Destination database">
+      <article class="destination-card" data-destination="ember">
+        <h3 class="destination-name">Ember</h3>
+        <dl class="destination-stats">
+          <div class="stat">
+            <dt>Fuel required</dt>
+            <dd data-field="fuel-required">60</dd>
+          </div>
+          <div class="stat">
+            <dt>Atmosphere</dt>
+            <dd data-field="atmosphere">Safe</dd>
+          </div>
+        </dl>
+        <p class="destination-status" data-field="status" aria-live="polite">
+          Not scanned
+        </p>
+        <button class="launch-button" data-field="launch" type="button" disabled>
+          Launch to Ember
+        </button>
+      </article>
+
+      <article class="destination-card" data-destination="hollow">
+        <h3 class="destination-name">Hollow</h3>
+        <dl class="destination-stats">
+          <div class="stat">
+            <dt>Fuel required</dt>
+            <dd data-field="fuel-required">25</dd>
+          </div>
+          <div class="stat">
+            <dt>Atmosphere</dt>
+            <dd data-field="atmosphere">Unsafe</dd>
+          </div>
+        </dl>
+        <p class="destination-status" data-field="status" aria-live="polite">
+          Not scanned
+        </p>
+        <button class="launch-button" data-field="launch" type="button" disabled>
+          Launch to Hollow
+        </button>
+      </article>
+
+      <article class="destination-card" data-destination="haven">
+        <h3 class="destination-name">Haven</h3>
+        <dl class="destination-stats">
+          <div class="stat">
+            <dt>Fuel required</dt>
+            <dd data-field="fuel-required">40</dd>
+          </div>
+          <div class="stat">
+            <dt>Atmosphere</dt>
+            <dd data-field="atmosphere">Safe</dd>
+          </div>
+        </dl>
+        <p class="destination-status" data-field="status" aria-live="polite">
+          Not scanned
+        </p>
+        <button class="launch-button" data-field="launch" type="button" disabled>
+          Launch to Haven
+        </button>
+      </article>
+    </section>
+
+    <!-- Success panel (hidden until a valid launch) -->
+    <section id="success-panel" class="success-panel" role="status" hidden>
+      <h2>LAUNCH SUCCESSFUL</h2>
+      <p>CREW SAFE. MISSION COMPLETE.</p>
+    </section>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>

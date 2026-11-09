@@ -1,0 +1,238 @@
+:root {
+  --bg: #0a0e1a;
+  --panel: #141b2e;
+  --panel-border: #263150;
+  --text: #e6ecff;
+  --muted: #8a97bd;
+  --accent: #5bc8ff;
+  --ok: #3ddc84;
+  --warn: #ffcc4d;
+  --danger: #ff6b6b;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+  background: radial-gradient(circle at top, #11203f 0%, var(--bg) 70%);
+  color: var(--text);
+  min-height: 100vh;
+}
+
+.dashboard-header {
+  text-align: center;
+  padding: 1.5rem 1rem 0.5rem;
+}
+
+.dashboard-header h1 {
+  margin: 0;
+  font-size: 1.6rem;
+  letter-spacing: 0.08em;
+}
+
+.subtitle {
+  color: var(--muted);
+  margin: 0.25rem 0 0;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  font-size: 0.8rem;
+}
+
+.dashboard {
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 1rem 1.25rem 3rem;
+}
+
+.fuel-panel,
+.scan-panel {
+  background: var(--panel);
+  border: 1px solid var(--panel-border);
+  border-radius: 12px;
+  padding: 1rem 1.25rem;
+  margin-bottom: 1rem;
+}
+
+.fuel-panel h2 {
+  margin: 0 0 0.5rem;
+  font-size: 1rem;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.fuel-gauge {
+  display: flex;
+  align-items: baseline;
+  gap: 0.4rem;
+}
+
+.fuel-value {
+  font-size: 2.4rem;
+  font-weight: 700;
+  color: var(--accent);
+}
+
+.fuel-unit {
+  color: var(--muted);
+}
+
+.fuel-note {
+  margin: 0.25rem 0 0;
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+.scan-panel {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.5rem;
+}
+
+.scan-button {
+  background: var(--accent);
+  color: #06233a;
+  border: none;
+  border-radius: 8px;
+  padding: 0.7rem 1.4rem;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.scan-button:hover {
+  filter: brightness(1.08);
+}
+
+.scan-hint {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+.destinations {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1rem;
+}
+
+.destination-card {
+  background: var(--panel);
+  border: 1px solid var(--panel-border);
+  border-radius: 12px;
+  padding: 1.1rem 1.2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.destination-name {
+  margin: 0;
+  font-size: 1.25rem;
+}
+
+.destination-stats {
+  margin: 0;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem;
+}
+
+.destination-stats .stat {
+  display: flex;
+  flex-direction: column;
+}
+
+.destination-stats dt {
+  color: var(--muted);
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.destination-stats dd {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.destination-status {
+  margin: 0;
+  padding: 0.5rem 0.75rem;
+  border-radius: 8px;
+  background: #0f1627;
+  border: 1px solid var(--panel-border);
+  font-weight: 600;
+  min-height: 1.2em;
+}
+
+/* Status variants (set via a status class, not color alone) */
+.destination-status.status-ok {
+  border-color: var(--ok);
+  color: var(--ok);
+}
+
+.destination-status.status-ok::before {
+  content: "\2713 "; /* check mark + text label stays readable */
+}
+
+.destination-status.status-warn {
+  border-color: var(--warn);
+  color: var(--warn);
+}
+
+.destination-status.status-warn::before {
+  content: "\26A0 "; /* warning sign */
+}
+
+.destination-status.status-danger {
+  border-color: var(--danger);
+  color: var(--danger);
+}
+
+.destination-status.status-danger::before {
+  content: "\2715 "; /* cross mark */
+}
+
+.launch-button {
+  background: var(--ok);
+  color: #04291a;
+  border: none;
+  border-radius: 8px;
+  padding: 0.6rem 1rem;
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+  margin-top: auto;
+}
+
+.launch-button:disabled {
+  background: #1d2844;
+  color: var(--muted);
+  cursor: not-allowed;
+}
+
+.success-panel {
+  margin-top: 1.5rem;
+  text-align: center;
+  padding: 2rem;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #0d3b2a, #0a2a44);
+  border: 1px solid var(--ok);
+}
+
+.success-panel h2 {
+  margin: 0 0 0.5rem;
+  color: var(--ok);
+  letter-spacing: 0.12em;
+}
+
+.success-panel p {
+  margin: 0;
+  color: var(--text);
+  letter-spacing: 0.1em;
+}
