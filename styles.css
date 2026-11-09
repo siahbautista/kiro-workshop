@@ -29,7 +29,7 @@
 
 body {
   margin: 0;
-  font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+  font-family: var(--font-display);
   background: radial-gradient(circle at top, var(--glow) 0%, var(--bg) 70%);
   color: var(--text);
   min-height: 100vh;
@@ -41,24 +41,14 @@ body {
   overflow: hidden;
   display: flex;
   align-items: flex-end;
-  min-height: clamp(360px, 62vh, 520px);
-  padding: 3rem max(1.25rem, calc((100% - 980px) / 2 + 1.25rem)) 2.25rem;
+  min-height: clamp(420px, 66vh, 560px);
+  padding: 5rem max(1.25rem, calc((100% - 980px) / 2 + 1.25rem)) 4rem;
 }
 
-/* The mask fades the sky and star into the page below */
+/* Everything seen through the windshield */
 .hero-sky {
   position: absolute;
   inset: 0;
-  --fade: linear-gradient(
-    to bottom,
-    #000 66%,
-    rgb(0 0 0 / 0.82) 78%,
-    rgb(0 0 0 / 0.45) 89%,
-    rgb(0 0 0 / 0.15) 96%,
-    transparent
-  );
-  -webkit-mask-image: var(--fade);
-  mask-image: var(--fade);
 }
 
 /* Drifting stars. Each layer is a repeating tile, one tile larger than the
@@ -394,39 +384,25 @@ body {
   font-size: 1rem;
 }
 
-/* Second section: the same space as the hero. The glows sit in the side
-   margins, and fade out before the edges so the section has no visible seam. */
+/* Second section: the bulkhead behind the console, built from hull plates.
+   The purple light is the console glowing against the wall. */
 .mission-bay {
   position: relative;
   overflow: hidden;
   background:
-    radial-gradient(ellipse 30% 45% at 98% 45%, rgb(205 95 235 / 0.24), transparent),
-    radial-gradient(ellipse 34% 40% at 3% 60%, rgb(144 70 255 / 0.34), transparent);
-}
-
-.bay-sky {
-  position: absolute;
-  inset: 0;
-  --bay-fade: linear-gradient(to bottom, transparent, #000 110px, #000 72%, transparent);
-  -webkit-mask-image: var(--bay-fade);
-  mask-image: var(--bay-fade);
-}
-
-.bay-sky::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background-image:
-    linear-gradient(to right, rgb(194 160 253 / 0.07) 1px, transparent 1px),
-    linear-gradient(to bottom, rgb(194 160 253 / 0.07) 1px, transparent 1px);
-  background-size: 48px 48px;
+    radial-gradient(ellipse 60% 55% at 50% 42%, rgb(144 70 255 / 0.2), transparent),
+    linear-gradient(to right, rgb(0 0 0 / 0.4) 2px, transparent 2px) 0 0 / 280px 100%,
+    linear-gradient(to bottom, rgb(0 0 0 / 0.4) 2px, transparent 2px) 0 0 / 100% 180px,
+    linear-gradient(to right, rgb(255 255 255 / 0.03) 1px, transparent 1px) 2px 0 / 280px 100%,
+    linear-gradient(to bottom, rgb(255 255 255 / 0.03) 1px, transparent 1px) 0 2px / 100% 180px,
+    #17121f;
 }
 
 .dashboard {
   position: relative;
   max-width: 980px;
   margin: 0 auto;
-  padding: 1.5rem 1.25rem 5rem;
+  padding: 2rem 1.25rem 4.5rem;
 }
 
 /* Flight plan: one chart with a shared fuel scale.
@@ -439,12 +415,13 @@ body {
   --plan-inset: 1.5rem;
   overflow: hidden;
   padding-inline: var(--plan-inset);
-  background: linear-gradient(180deg, #272034, #1f1a28);
-  border: 1px solid rgb(194 160 253 / 0.2);
-  border-radius: 14px;
+  position: relative;
+  background: linear-gradient(180deg, #2b2438, #1d1826);
+  border: 1px solid rgb(194 160 253 / 0.28);
+  border-radius: 4px;
   box-shadow:
-    inset 0 1px 0 rgb(255 255 255 / 0.05),
-    0 30px 90px rgb(144 70 255 / 0.22);
+    inset 0 1px 0 rgb(255 255 255 / 0.07),
+    0 18px 50px rgb(0 0 0 / 0.55);
 }
 
 .flight-axis,
@@ -509,11 +486,15 @@ body {
 .fuel-limit,
 .destination-fuel {
   position: relative;
-  background: linear-gradient(
-    to right,
-    rgb(144 70 255 / 0.15) var(--fuel-limit),
-    rgb(205 95 235 / 0.07) var(--fuel-limit)
-  );
+  /* The fuel column is a screen: scanlines over the two zones */
+  background:
+    repeating-linear-gradient(to bottom, rgb(255 255 255 / 0.025) 0 1px, transparent 1px 3px),
+    linear-gradient(
+      to right,
+      rgb(144 70 255 / 0.2) var(--fuel-limit),
+      rgb(205 95 235 / 0.08) var(--fuel-limit)
+    ),
+    #100c17;
 }
 
 .fuel-limit {
@@ -612,9 +593,6 @@ body {
   cursor: pointer;
 }
 
-.scan-button {
-  box-shadow: 0 6px 22px rgb(144 70 255 / 0.45);
-}
 
 /* Buttons don't pick up the page font unless they are told to */
 .scan-button,
@@ -634,9 +612,6 @@ body {
   transform: translateY(1px);
 }
 
-.launch-button:not(:disabled) {
-  box-shadow: 0 6px 20px rgb(128 255 181 / 0.25);
-}
 
 .scan-button:focus-visible,
 .launch-button:focus-visible {
@@ -882,14 +857,24 @@ body {
 .fuel-track {
   position: relative;
   height: 18px;
+  container-type: inline-size;
 }
 
 .fuel-bar {
   position: absolute;
   inset: 0 auto 0 0;
   width: calc(var(--fuel-shown, var(--fuel-required)) / var(--fuel-scale) * 100%);
-  border-radius: 0 3px 3px 0;
   background: var(--bar-idle);
+  /* Cuts the bar into fuel cells of 2.5 units each (75 units / 30 cells),
+     so that 25, 40 and 60 all end on a whole cell */
+  --cell: calc(100cqw / 30);
+  --cell-mask: repeating-linear-gradient(
+    to right,
+    #000 0 calc(var(--cell) - 3px),
+    transparent calc(var(--cell) - 3px) var(--cell)
+  );
+  -webkit-mask-image: var(--cell-mask);
+  mask-image: var(--cell-mask);
   transition: background-color 0.3s;
 }
 
@@ -898,7 +883,6 @@ body {
   content: "";
   position: absolute;
   inset: 0 0 0 calc(var(--fuel-available) / var(--fuel-shown, var(--fuel-required)) * 100%);
-  border-radius: inherit;
   background: transparent;
   transition: background-color 0.3s;
 }
@@ -1073,4 +1057,196 @@ body {
   margin: 0;
   color: var(--text);
   letter-spacing: 0.1em;
+}
+
+/* ---- Spaceship cockpit ------------------------------------------------ */
+
+/* Windshield frame. It sits over the sky and under the title. */
+.hull {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.hull-pillar {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: clamp(44px, 7vw, 130px);
+  background: linear-gradient(100deg, #120e19, #2b2438);
+  clip-path: polygon(0 0, 100% 0, 0 100%);
+}
+
+/* Lit edge along the inside of the pillar */
+.hull-pillar::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgb(194 160 253 / 0.55);
+  clip-path: polygon(calc(100% - 3px) 0, 100% 0, 0 100%, 0 calc(100% - 3px));
+}
+
+.hull-pillar-right {
+  left: auto;
+  right: 0;
+  transform: scaleX(-1);
+}
+
+.hull-top {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  align-items: center;
+  gap: 1.75rem;
+  height: 42px;
+  padding-inline: max(1.25rem, calc((100% - 980px) / 2 + 1.25rem));
+  color: var(--muted);
+  font-size: 0.85rem;
+  background: linear-gradient(180deg, #2b2438, #17121f);
+  border-bottom: 1px solid rgb(194 160 253 / 0.45);
+}
+
+.led {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.led::before {
+  content: "";
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--led);
+  box-shadow: 0 0 8px var(--led);
+}
+
+.led-ok {
+  --led: var(--ok);
+}
+
+.led-warn {
+  --led: var(--danger);
+  margin-left: auto;
+  color: var(--danger);
+}
+
+.led-warn::before {
+  animation: led-blink 1.4s steps(2, jump-none) infinite;
+}
+
+@keyframes led-blink {
+  to {
+    opacity: 0.2;
+  }
+}
+
+/* Targeting ring locked onto the star */
+.hud-ring {
+  position: absolute;
+  inset: -7%;
+  border: 1px dashed rgb(194 160 253 / 0.65);
+  border-radius: 50%;
+  animation: moon-orbit 48s linear infinite;
+}
+
+/* The top edge of the dashboard, overlapping the bottom of the windshield */
+.console-lip {
+  position: relative;
+  z-index: 2;
+  height: 40px;
+  margin-top: -40px;
+  background:
+    linear-gradient(rgb(194 160 253 / 0.55), rgb(194 160 253 / 0.55)) top / 100% 2px no-repeat,
+    linear-gradient(180deg, #2b2438, #17121f);
+  clip-path: polygon(5% 0, 95% 0, 100% 100%, 0 100%);
+}
+
+/* Lit corner brackets, the same marks a targeting display would use */
+.flight-plan::after,
+.success-panel::after {
+  --bracket: 22px;
+  --bracket-line: 2px;
+  --bracket-color: linear-gradient(var(--accent-text), var(--accent-text));
+  content: "";
+  position: absolute;
+  z-index: 3;
+  inset: 0;
+  pointer-events: none;
+  background:
+    var(--bracket-color) top left / var(--bracket) var(--bracket-line) no-repeat,
+    var(--bracket-color) top left / var(--bracket-line) var(--bracket) no-repeat,
+    var(--bracket-color) top right / var(--bracket) var(--bracket-line) no-repeat,
+    var(--bracket-color) top right / var(--bracket-line) var(--bracket) no-repeat,
+    var(--bracket-color) bottom left / var(--bracket) var(--bracket-line) no-repeat,
+    var(--bracket-color) bottom left / var(--bracket-line) var(--bracket) no-repeat,
+    var(--bracket-color) bottom right / var(--bracket) var(--bracket-line) no-repeat,
+    var(--bracket-color) bottom right / var(--bracket-line) var(--bracket) no-repeat;
+}
+
+.success-panel {
+  position: relative;
+  border-radius: 4px;
+}
+
+/* Console keys with cut corners */
+.scan-button,
+.launch-button {
+  border-radius: 0;
+  clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
+}
+
+.scan-button {
+  background: linear-gradient(180deg, #a366ff, var(--accent));
+}
+
+.launch-button:disabled {
+  background: var(--panel-raised);
+  border-color: transparent;
+}
+
+/* An armed launch key gets hazard stripes along its left edge */
+.launch-button:not(:disabled) {
+  background:
+    repeating-linear-gradient(135deg, var(--bg) 0 5px, var(--warn) 5px 10px) left / 14px 100% no-repeat,
+    var(--ok);
+  padding-left: 1.5rem;
+  animation: key-armed 1.5s ease-in-out infinite;
+}
+
+@keyframes key-armed {
+  50% {
+    filter: brightness(1.18);
+  }
+}
+
+/* The one row you can launch to gets a lit edge */
+.destination-card:has(.status-ok) {
+  box-shadow: inset 3px 0 0 var(--ok), inset 0 1px 0 var(--panel-border);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hud-ring,
+  .led-warn::before,
+  .launch-button:not(:disabled) {
+    animation: none;
+  }
+}
+
+@media (max-width: 640px) {
+  .hero {
+    min-height: 470px;
+  }
+
+  .hero-star {
+    top: 56px;
+  }
+
+  .hull-pillar,
+  .hull-top .led:nth-child(2) {
+    display: none;
+  }
 }

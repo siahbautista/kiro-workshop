@@ -18,6 +18,7 @@
       <div class="hero-shuttle comet-4"></div>
       <div class="hero-shuttle comet-5"></div>
       <div class="hero-star">
+        <div class="hud-ring"></div>
         <!-- Ghost eclipse: .eclipse rises in on load, hero.js moves .eclipse-ghost -->
         <div class="eclipse">
           <div class="eclipse-ghost">
@@ -25,6 +26,17 @@
             <svg class="eclipse-eyes" viewBox="0 0 1200 1200"><use href="#kiro-ghost-eyes" /></svg>
           </div>
         </div>
+      </div>
+    </div>
+
+    <!-- Windshield frame: canopy status bar and the two hull pillars -->
+    <div class="hull" aria-hidden="true">
+      <div class="hull-pillar hull-pillar-left"></div>
+      <div class="hull-pillar hull-pillar-right"></div>
+      <div class="hull-top">
+        <span class="led led-ok">Life support</span>
+        <span class="led led-ok">Nav link</span>
+        <span class="led led-warn">Star collapsing</span>
       </div>
     </div>
 
@@ -58,12 +70,11 @@
     </svg>
   </header>
 
-  <!-- Second section: deep-space backdrop behind the flight-plan chart -->
+  <!-- The edge of the dashboard, rising in front of the windshield -->
+  <div class="console-lip" aria-hidden="true"></div>
+
+  <!-- Second section: the ship's instrument console -->
   <div class="mission-bay">
-    <div class="bay-sky" aria-hidden="true">
-      <div class="drift-stars drift-stars-far"></div>
-      <div class="drift-stars drift-stars-near"></div>
-    </div>
 
   <main class="dashboard">
     <!-- One chart: the fuel reserve is a line running down through every planet -->
