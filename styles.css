@@ -14,7 +14,13 @@
   --warn: #ffcf99;
   --danger: #ff80b5;
   --star-core: #fff2b3;
-  --bar-idle: #76717f;
+  --bar-idle: #8a7fa3;
+  --font-display: Bahnschrift, "DIN Condensed", "Arial Narrow", "Segoe UI", sans-serif;
+}
+
+::selection {
+  background: var(--accent);
+  color: #ffffff;
 }
 
 * {
@@ -35,7 +41,7 @@ body {
   overflow: hidden;
   display: flex;
   align-items: flex-end;
-  min-height: clamp(320px, 56vh, 480px);
+  min-height: clamp(360px, 62vh, 520px);
   padding: 3rem max(1.25rem, calc((100% - 980px) / 2 + 1.25rem)) 2.25rem;
 }
 
@@ -45,8 +51,10 @@ body {
   inset: 0;
   --fade: linear-gradient(
     to bottom,
-    #000 76%,
-    rgb(0 0 0 / 0.6) 90%,
+    #000 66%,
+    rgb(0 0 0 / 0.82) 78%,
+    rgb(0 0 0 / 0.45) 89%,
+    rgb(0 0 0 / 0.15) 96%,
     transparent
   );
   -webkit-mask-image: var(--fade);
@@ -102,8 +110,8 @@ body {
   position: absolute;
   inset: 0;
   background-image:
-    linear-gradient(to right, rgb(194 160 253 / 0.1) 1px, transparent 1px),
-    linear-gradient(to bottom, rgb(194 160 253 / 0.1) 1px, transparent 1px);
+    linear-gradient(to right, rgb(194 160 253 / 0.07) 1px, transparent 1px),
+    linear-gradient(to bottom, rgb(194 160 253 / 0.07) 1px, transparent 1px);
   background-size: 48px 48px;
 }
 
@@ -132,6 +140,13 @@ body {
 @media (min-width: 1200px) {
   .hero-star {
     --star-size: clamp(200px, 29vw, 440px);
+  }
+}
+
+/* A smaller star needs to sit higher, or the horizon fade dims the ghost's eyes */
+@media (max-width: 1199px) {
+  .hero-star {
+    bottom: calc(var(--star-size) * -0.05);
   }
 }
 
@@ -311,13 +326,24 @@ body {
 
 .hero-copy {
   position: relative;
+  isolation: isolate;
+}
+
+/* A soft shadow behind the text, so comets and stars don't compete with it */
+.hero-copy::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  inset: -3rem -5rem -2.5rem -6rem;
+  background: radial-gradient(closest-side, rgb(25 22 29 / 0.62), rgb(25 22 29 / 0.4) 62%, transparent);
+  pointer-events: none;
 }
 
 .hero-logo {
   display: block;
-  width: clamp(64px, 8vw, 104px);
-  height: clamp(64px, 8vw, 104px);
-  margin-bottom: 1.25rem;
+  width: clamp(56px, 6vw, 84px);
+  height: clamp(56px, 6vw, 84px);
+  margin-bottom: 1.75rem;
 }
 
 /* Negative left/top are half its size, so hero.js positions its center.
@@ -341,7 +367,7 @@ body {
 
 .hero h1 {
   margin: 0;
-  font-family: Bahnschrift, "DIN Condensed", "Arial Narrow", "Segoe UI", sans-serif;
+  font-family: var(--font-display);
   font-weight: 700;
 }
 
@@ -391,8 +417,8 @@ body {
   position: absolute;
   inset: 0;
   background-image:
-    linear-gradient(to right, rgb(194 160 253 / 0.1) 1px, transparent 1px),
-    linear-gradient(to bottom, rgb(194 160 253 / 0.1) 1px, transparent 1px);
+    linear-gradient(to right, rgb(194 160 253 / 0.07) 1px, transparent 1px),
+    linear-gradient(to bottom, rgb(194 160 253 / 0.07) 1px, transparent 1px);
   background-size: 48px 48px;
 }
 
@@ -413,10 +439,12 @@ body {
   --plan-inset: 1.5rem;
   overflow: hidden;
   padding-inline: var(--plan-inset);
-  background: var(--panel);
-  border: 1px solid var(--panel-border);
-  border-radius: 12px;
-  box-shadow: 0 30px 90px rgb(144 70 255 / 0.18);
+  background: linear-gradient(180deg, #272034, #1f1a28);
+  border: 1px solid rgb(194 160 253 / 0.2);
+  border-radius: 14px;
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.05),
+    0 30px 90px rgb(144 70 255 / 0.22);
 }
 
 .flight-axis,
@@ -435,6 +463,8 @@ body {
 }
 
 .flight-axis {
+  margin-inline: calc(var(--plan-inset) * -1);
+  padding-inline: var(--plan-inset);
   box-shadow: inset 0 1px 0 var(--panel-border);
 }
 
@@ -454,7 +484,7 @@ body {
 .fuel-summary h2,
 .destination-name {
   margin: 0;
-  font-family: Bahnschrift, "DIN Condensed", "Arial Narrow", "Segoe UI", sans-serif;
+  font-family: var(--font-display);
   font-weight: 600;
 }
 
@@ -482,7 +512,7 @@ body {
   background: linear-gradient(
     to right,
     rgb(144 70 255 / 0.15) var(--fuel-limit),
-    rgb(255 128 181 / 0.06) var(--fuel-limit)
+    rgb(205 95 235 / 0.07) var(--fuel-limit)
   );
 }
 
@@ -544,7 +574,7 @@ body {
 
 .fuel-value,
 .fuel-required {
-  font-family: Bahnschrift, "DIN Condensed", "Arial Narrow", "Segoe UI", sans-serif;
+  font-family: var(--font-display);
   font-weight: 700;
 }
 
@@ -565,8 +595,9 @@ body {
 }
 
 .scan-hint {
-  max-width: 19rem;
+  max-width: 30rem;
   text-align: right;
+  text-wrap: balance;
 }
 
 .scan-button {
@@ -581,8 +612,30 @@ body {
   cursor: pointer;
 }
 
-.scan-button:hover {
-  filter: brightness(1.08);
+.scan-button {
+  box-shadow: 0 6px 22px rgb(144 70 255 / 0.45);
+}
+
+/* Buttons don't pick up the page font unless they are told to */
+.scan-button,
+.launch-button {
+  font-family: var(--font-display);
+  letter-spacing: 0.01em;
+  transition: filter 0.15s, transform 0.1s, box-shadow 0.15s;
+}
+
+.scan-button:hover,
+.launch-button:not(:disabled):hover {
+  filter: brightness(1.1);
+}
+
+.scan-button:active,
+.launch-button:not(:disabled):active {
+  transform: translateY(1px);
+}
+
+.launch-button:not(:disabled) {
+  box-shadow: 0 6px 20px rgb(128 255 181 / 0.25);
 }
 
 .scan-button:focus-visible,
@@ -606,11 +659,137 @@ body {
 }
 
 .planet {
+  position: relative;
   flex: none;
   width: 44px;
   height: 44px;
   border-radius: 50%;
   transition: filter 0.3s;
+}
+
+/* Surface features sliding across the disc make the planet look like it spins.
+   The tile is 88px wide, so moving it exactly 88px loops without a jump. */
+.planet-surface {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background-size: 88px 44px;
+  animation: planet-spin var(--spin-time) linear infinite;
+}
+
+/* The shaded edge stays still on top, which keeps the planet looking round */
+.planet::before {
+  content: "";
+  position: absolute;
+  z-index: 1;
+  inset: 0;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, transparent 42%, rgb(25 22 29 / 0.55) 100%);
+}
+
+@keyframes planet-spin {
+  to {
+    background-position: -88px 0;
+  }
+}
+
+/* Ember: molten patches and a flickering glow */
+.planet-ember {
+  --spin-time: 6s;
+  animation: ember-flare 2.6s ease-in-out infinite;
+}
+
+.planet-ember .planet-surface {
+  background-image:
+    radial-gradient(9px 5px at 14px 13px, rgb(255 242 179 / 0.9), transparent),
+    radial-gradient(12px 6px at 40px 29px, rgb(150 25 85 / 0.65), transparent),
+    radial-gradient(7px 4px at 62px 12px, rgb(150 25 85 / 0.6), transparent),
+    radial-gradient(10px 5px at 76px 33px, rgb(255 242 179 / 0.8), transparent);
+}
+
+@keyframes ember-flare {
+  0%,
+  100% {
+    box-shadow: 0 0 8px rgb(255 128 181 / 0.35);
+  }
+  35% {
+    box-shadow: 0 0 20px rgb(255 128 181 / 0.75);
+  }
+  55% {
+    box-shadow: 0 0 11px rgb(255 128 181 / 0.45);
+  }
+  75% {
+    box-shadow: 0 0 24px 2px rgb(255 207 153 / 0.65);
+  }
+}
+
+/* Hollow: toxic clouds and a warning ring pulsing outward */
+.planet-hollow {
+  --spin-time: 11s;
+}
+
+.planet-hollow .planet-surface {
+  background-image:
+    radial-gradient(16px 5px at 18px 12px, rgb(226 255 170 / 0.55), transparent),
+    radial-gradient(20px 5px at 52px 24px, rgb(30 70 55 / 0.6), transparent),
+    radial-gradient(14px 4px at 78px 35px, rgb(226 255 170 / 0.45), transparent);
+}
+
+.planet-hollow::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border: 2px solid var(--ok);
+  border-radius: 50%;
+  opacity: 0;
+  animation: hollow-warning 3.2s ease-out infinite;
+}
+
+@keyframes hollow-warning {
+  from {
+    transform: scale(1);
+    opacity: 0.7;
+  }
+  70%,
+  to {
+    transform: scale(1.5);
+    opacity: 0;
+  }
+}
+
+/* Haven: drifting white clouds and a small moon in orbit */
+.planet-haven {
+  --spin-time: 16s;
+}
+
+.planet-haven .planet-surface {
+  background-image:
+    radial-gradient(14px 4px at 16px 15px, rgb(255 255 255 / 0.75), transparent),
+    radial-gradient(10px 3px at 46px 31px, rgb(255 255 255 / 0.65), transparent),
+    radial-gradient(12px 4px at 72px 12px, rgb(255 255 255 / 0.6), transparent);
+}
+
+.planet-haven::after {
+  content: "";
+  position: absolute;
+  z-index: 2;
+  inset: -8px;
+  background: radial-gradient(circle 3px at 50% 3px, var(--text) 90%, transparent);
+  animation: moon-orbit 7s linear infinite;
+}
+
+@keyframes moon-orbit {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .planet,
+  .planet-surface,
+  .planet::after {
+    animation: none;
+  }
 }
 
 .planet-ember {
@@ -667,14 +846,37 @@ body {
   white-space: nowrap;
 }
 
-.destination-fuel .fuel-required {
+.destination-fuel .fuel-required,
+.fuel-count {
   position: absolute;
   z-index: 2;
   top: 50%;
-  left: calc(var(--fuel-required) / var(--fuel-scale) * 100% + 0.6rem);
+  left: calc(var(--fuel-shown, var(--fuel-required)) / var(--fuel-scale) * 100% + 0.6rem);
   transform: translateY(-50%);
+  font-family: var(--font-display);
   font-size: 1.5rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
   line-height: 1;
+}
+
+/* chart.js draws the moving number; the real one stays for screen readers */
+.destination-fuel .fuel-required.is-replaced {
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+}
+
+/* A small pop when the bar reaches its final value */
+.fuel-settled .fuel-count {
+  animation: fuel-count-pop 0.3s ease-out;
+}
+
+@keyframes fuel-count-pop {
+  40% {
+    transform: translateY(-50%) scale(1.28);
+  }
 }
 
 .fuel-track {
@@ -685,10 +887,9 @@ body {
 .fuel-bar {
   position: absolute;
   inset: 0 auto 0 0;
-  width: calc(var(--fuel-required) / var(--fuel-scale) * 100%);
+  width: calc(var(--fuel-shown, var(--fuel-required)) / var(--fuel-scale) * 100%);
   border-radius: 0 3px 3px 0;
   background: var(--bar-idle);
-  transform-origin: left;
   transition: background-color 0.3s;
 }
 
@@ -696,7 +897,7 @@ body {
 .fuel-bar::after {
   content: "";
   position: absolute;
-  inset: 0 0 0 calc(var(--fuel-available) / var(--fuel-required) * 100%);
+  inset: 0 0 0 calc(var(--fuel-available) / var(--fuel-shown, var(--fuel-required)) * 100%);
   border-radius: inherit;
   background: transparent;
   transition: background-color 0.3s;
@@ -765,33 +966,6 @@ body {
 .destination-card:has(.status-warn) .planet,
 .destination-card:has(.status-danger) .planet {
   filter: saturate(0.45) brightness(0.8);
-}
-
-/* Bars re-measure one after another when a scan result arrives */
-.destination-card:has(.status-ok) .fuel-bar,
-.destination-card:has(.status-warn) .fuel-bar,
-.destination-card:has(.status-danger) .fuel-bar {
-  animation: fuel-measure 0.55s cubic-bezier(0.2, 0.7, 0.2, 1) backwards;
-}
-
-.destination-card:nth-child(2) .fuel-bar {
-  animation-delay: 0.15s;
-}
-
-.destination-card:nth-child(3) .fuel-bar {
-  animation-delay: 0.3s;
-}
-
-@keyframes fuel-measure {
-  from {
-    transform: scaleX(0);
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .destination-card .fuel-bar {
-    animation: none !important;
-  }
 }
 
 .launch-button {
@@ -884,12 +1058,15 @@ body {
   border-radius: 12px;
   background: linear-gradient(135deg, var(--glow), var(--bg));
   border: 1px solid var(--ok);
+  box-shadow: 0 20px 70px rgb(128 255 181 / 0.14);
 }
 
 .success-panel h2 {
   margin: 0 0 0.5rem;
   color: var(--ok);
-  letter-spacing: 0.12em;
+  font-family: var(--font-display);
+  font-size: clamp(1.75rem, 4vw, 2.5rem);
+  letter-spacing: 0.04em;
 }
 
 .success-panel p {
