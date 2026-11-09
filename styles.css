@@ -1,13 +1,20 @@
 :root {
-  --bg: #0a0e1a;
-  --panel: #141b2e;
-  --panel-border: #263150;
-  --text: #e6ecff;
-  --muted: #8a97bd;
-  --accent: #5bc8ff;
-  --ok: #3ddc84;
-  --warn: #ffcc4d;
-  --danger: #ff6b6b;
+  /* Kiro palette (values from kiro.dev) */
+  --bg: #19161d;
+  --panel: #211d25;
+  --panel-inset: #19161d;
+  --panel-raised: #28242e;
+  --panel-border: #352f3d;
+  --glow: #2b1d45;
+  --text: #eaeded;
+  --muted: #938f9b;
+  --accent: #9046ff;
+  --accent-text: #c2a0fd;
+  --ok: #80ffb5;
+  --warn: #ffcf99;
+  --danger: #ff80b5;
+  --star-core: #fff2b3;
+  --bar-idle: #76717f;
 }
 
 * {
@@ -17,85 +24,555 @@
 body {
   margin: 0;
   font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
-  background: radial-gradient(circle at top, #11203f 0%, var(--bg) 70%);
+  background: radial-gradient(circle at top, var(--glow) 0%, var(--bg) 70%);
   color: var(--text);
   min-height: 100vh;
 }
 
-.dashboard-header {
-  text-align: center;
-  padding: 1.5rem 1rem 0.5rem;
+/* Hero: copy lines up with the left edge of the dashboard column below */
+.hero {
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: flex-end;
+  min-height: clamp(320px, 56vh, 480px);
+  padding: 3rem max(1.25rem, calc((100% - 980px) / 2 + 1.25rem)) 2.25rem;
 }
 
-.dashboard-header h1 {
+/* The mask fades the sky and star into the page below */
+.hero-sky {
+  position: absolute;
+  inset: 0;
+  --fade: linear-gradient(
+    to bottom,
+    #000 76%,
+    rgb(0 0 0 / 0.6) 90%,
+    transparent
+  );
+  -webkit-mask-image: var(--fade);
+  mask-image: var(--fade);
+}
+
+/* Drifting stars. Each layer is a repeating tile, one tile larger than the
+   sky, that moves exactly one tile per loop, so the restart can't be seen. */
+.drift-stars {
+  position: absolute;
+  top: calc(var(--tile-height) * -1);
+  right: calc(var(--tile-width) * -1);
+  bottom: 0;
+  left: 0;
+  background-size: var(--tile-width) var(--tile-height);
+  animation: stars-drift var(--drift-time) linear infinite;
+  will-change: transform;
+}
+
+.drift-stars-far {
+  --tile-width: 317px;
+  --tile-height: 211px;
+  --drift-time: 45s;
+  background-image:
+    radial-gradient(1px 1px at 37px 52px, var(--text), transparent),
+    radial-gradient(1px 1px at 201px 148px, var(--muted), transparent),
+    radial-gradient(1.5px 1.5px at 281px 31px, var(--accent-text), transparent),
+    radial-gradient(1px 1px at 96px 171px, var(--muted), transparent),
+    radial-gradient(1px 1px at 141px 83px, var(--text), transparent);
+}
+
+.drift-stars-near {
+  --tile-width: 431px;
+  --tile-height: 269px;
+  --drift-time: 24s;
+  background-image:
+    radial-gradient(2px 2px at 64px 197px, var(--text), transparent),
+    radial-gradient(1.5px 1.5px at 183px 43px, var(--accent-text), transparent),
+    radial-gradient(2px 2px at 322px 121px, var(--star-core), transparent),
+    radial-gradient(1.5px 1.5px at 401px 236px, var(--text), transparent);
+}
+
+/* Down and to the left, against the comet's flight */
+@keyframes stars-drift {
+  to {
+    transform: translate(calc(var(--tile-width) * -1), var(--tile-height));
+  }
+}
+
+/* Navigation-chart grid, sitting behind the star */
+.hero-sky::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(to right, rgb(194 160 253 / 0.1) 1px, transparent 1px),
+    linear-gradient(to bottom, rgb(194 160 253 / 0.1) 1px, transparent 1px);
+  background-size: 48px 48px;
+}
+
+.hero-star {
+  position: absolute;
+  --star-size: clamp(170px, 27vw, 440px);
+  right: 1.5%;
+  bottom: calc(var(--star-size) * -0.22); /* sits partly below the horizon */
+  width: var(--star-size);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    var(--star-core) 0%,
+    var(--warn) 16%,
+    var(--danger) 40%,
+    var(--accent) 100%
+  );
+  box-shadow:
+    0 0 60px 20px rgb(144 70 255 / 0.55),
+    0 0 180px 80px rgb(144 70 255 / 0.25);
+  animation: star-collapse 1.8s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+
+/* Wide screens have room for a bigger star beside the title */
+@media (min-width: 1200px) {
+  .hero-star {
+    --star-size: clamp(200px, 29vw, 440px);
+  }
+}
+
+/* Ghost eclipse: the logo's ghost in negative, crossing in front of the star */
+.eclipse {
+  position: absolute;
+  inset: -3%;
+  animation: eclipse-rise 1.8s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+
+/* Faces left by default, toward the title. hero.js takes over from here. */
+.eclipse-ghost {
+  position: absolute;
+  inset: 0;
+  transform: scaleX(-1);
+  will-change: transform;
+}
+
+.eclipse-body,
+.eclipse-eyes {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.eclipse-body {
+  fill: var(--bg);
+  filter: drop-shadow(0 0 14px rgb(255 242 179 / 0.85));
+}
+
+.eclipse-eyes {
+  fill: var(--star-core);
+  filter: drop-shadow(0 0 7px var(--warn));
+  will-change: transform;
+}
+
+@keyframes eclipse-rise {
+  from {
+    transform: translateY(55%);
+    opacity: 0;
+  }
+}
+
+/* A short streak with a bright nose, flying up and away from the star */
+.hero-shuttle {
+  position: absolute;
+  top: var(--top);
+  right: var(--right);
+  width: calc(clamp(90px, 16vw, 200px) * var(--length, 1));
+  height: 2px;
+  background: linear-gradient(to right, transparent, var(--accent-text));
+  transform: rotate(-24deg);
+  animation: shuttle-fly var(--fly-time) linear var(--fly-delay, 0s) infinite;
+}
+
+/* Different speeds and negative delays keep the comets from moving in sync */
+.comet-1 {
+  --top: 22%;
+  --right: 30%;
+  --fly-time: 5s;
+}
+
+.comet-2 {
+  --top: 6%;
+  --right: 56%;
+  --length: 0.65;
+  --glow: 0.7;
+  --fly-time: 7.3s;
+  --fly-delay: -2.1s;
+}
+
+.comet-3 {
+  --top: 40%;
+  --right: 14%;
+  --length: 0.8;
+  --glow: 0.85;
+  --fly-time: 6.1s;
+  --fly-delay: -4.4s;
+}
+
+.comet-4 {
+  --top: 58%;
+  --right: 60%;
+  --length: 0.5;
+  --glow: 0.55;
+  --fly-time: 9.2s;
+  --fly-delay: -6.7s;
+}
+
+.comet-5 {
+  --top: 14%;
+  --right: 8%;
+  --length: 1.15;
+  --fly-time: 5.6s;
+  --fly-delay: -1.3s;
+}
+
+.hero-shuttle::after {
+  content: "";
+  position: absolute;
+  right: -3px;
+  top: -2px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--text);
+  box-shadow: 0 0 10px 3px var(--accent-text);
+}
+
+/* On page load the star shrinks once as the ghost rises in front of it */
+@keyframes star-collapse {
+  from {
+    transform: scale(1.28);
+    filter: brightness(1.5);
+  }
+}
+
+/* Endless flight across the sky. It is invisible at both ends of its path,
+   so the jump back to the start can never be seen. */
+@keyframes shuttle-fly {
+  0% {
+    transform: rotate(-24deg) translateX(-38vw);
+    opacity: 0;
+  }
+  15%,
+  80% {
+    opacity: var(--glow, 1);
+  }
+  100% {
+    transform: rotate(-24deg) translateX(18vw);
+    opacity: 0;
+  }
+}
+
+/* Phones: the star moves up into the empty sky above the title */
+@media (max-width: 640px) {
+  .hero {
+    min-height: 400px;
+  }
+
+  .hero-star {
+    top: 5%;
+    bottom: auto;
+    right: 0;
+    width: 210px;
+  }
+
+  .comet-1 {
+    --top: 14%;
+    --right: 58%;
+  }
+
+  /* Less sky on a phone, so fewer comets */
+  .comet-4,
+  .comet-5 {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .drift-stars,
+  .hero-star,
+  .hero-shuttle,
+  .eclipse {
+    animation: none;
+  }
+
+  .comet-2,
+  .comet-3,
+  .comet-4,
+  .comet-5 {
+    display: none;
+  }
+}
+
+.hero-copy {
+  position: relative;
+}
+
+.hero-logo {
+  display: block;
+  width: clamp(64px, 8vw, 104px);
+  height: clamp(64px, 8vw, 104px);
+  margin-bottom: 1.25rem;
+}
+
+/* Negative left/top are half its size, so hero.js positions its center.
+   pointer-events: none lets clicks and text selection pass through it. */
+.hero-ghost {
+  position: absolute;
+  left: -18px;
+  top: -18px;
+  width: 36px;
+  height: 36px;
+  pointer-events: none;
+  filter: drop-shadow(0 0 6px rgb(144 70 255 / 0.9));
+  opacity: 0;
+  transition: opacity 0.2s;
+  will-change: transform;
+}
+
+.hero-ghost.is-visible {
+  opacity: 1;
+}
+
+.hero h1 {
   margin: 0;
-  font-size: 1.6rem;
-  letter-spacing: 0.08em;
+  font-family: Bahnschrift, "DIN Condensed", "Arial Narrow", "Segoe UI", sans-serif;
+  font-weight: 700;
+}
+
+.hero-title {
+  display: block;
+  font-size: clamp(3.25rem, 15vw, 9.5rem);
+  font-stretch: condensed;
+  line-height: 0.9;
+  letter-spacing: 0.01em;
+  overflow-wrap: anywhere;
+}
+
+.hero-tagline {
+  display: block;
+  margin-top: 0.6rem;
+  font-size: clamp(1.15rem, 3vw, 1.75rem);
+  font-weight: 400;
+  color: var(--accent-text);
 }
 
 .subtitle {
   color: var(--muted);
-  margin: 0.25rem 0 0;
-  letter-spacing: 0.15em;
-  text-transform: uppercase;
-  font-size: 0.8rem;
+  margin: 0.35rem 0 0;
+  font-size: 1rem;
+}
+
+/* Second section: the same space as the hero. The glows sit in the side
+   margins, and fade out before the edges so the section has no visible seam. */
+.mission-bay {
+  position: relative;
+  overflow: hidden;
+  background:
+    radial-gradient(ellipse 30% 45% at 98% 45%, rgb(205 95 235 / 0.24), transparent),
+    radial-gradient(ellipse 34% 40% at 3% 60%, rgb(144 70 255 / 0.34), transparent);
+}
+
+.bay-sky {
+  position: absolute;
+  inset: 0;
+  --bay-fade: linear-gradient(to bottom, transparent, #000 110px, #000 72%, transparent);
+  -webkit-mask-image: var(--bay-fade);
+  mask-image: var(--bay-fade);
+}
+
+.bay-sky::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(to right, rgb(194 160 253 / 0.1) 1px, transparent 1px),
+    linear-gradient(to bottom, rgb(194 160 253 / 0.1) 1px, transparent 1px);
+  background-size: 48px 48px;
 }
 
 .dashboard {
+  position: relative;
   max-width: 980px;
   margin: 0 auto;
-  padding: 1rem 1.25rem 3rem;
+  padding: 1.5rem 1.25rem 5rem;
 }
 
-.fuel-panel,
-.scan-panel {
+/* Flight plan: one chart with a shared fuel scale.
+   Every row uses the same columns so the fuel line stays straight. */
+.flight-plan {
+  --fuel-available: 40; /* keep in sync with AVAILABLE_FUEL in app.js */
+  --fuel-scale: 75; /* the fuel amount at the far right of each track */
+  --fuel-limit: calc(var(--fuel-available) / var(--fuel-scale) * 100%);
+  --plan-columns: 11rem minmax(0, 1fr) 12rem;
+  --plan-inset: 1.5rem;
+  overflow: hidden;
+  padding-inline: var(--plan-inset);
   background: var(--panel);
   border: 1px solid var(--panel-border);
   border-radius: 12px;
-  padding: 1rem 1.25rem;
-  margin-bottom: 1rem;
+  box-shadow: 0 30px 90px rgb(144 70 255 / 0.18);
 }
 
-.fuel-panel h2 {
-  margin: 0 0 0.5rem;
-  font-size: 1rem;
+.flight-axis,
+.destination-card {
+  display: grid;
+  grid-template-columns: var(--plan-columns);
+  column-gap: 1.75rem;
+}
+
+.flight-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 2rem;
+  padding-block: 1.1rem;
+}
+
+.flight-axis {
+  box-shadow: inset 0 1px 0 var(--panel-border);
+}
+
+.axis-heading {
+  align-self: end;
+  padding-bottom: 0.55rem;
   color: var(--muted);
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
+  font-size: 0.85rem;
+}
+
+.destination-identity,
+.destination-fuel,
+.destination-action {
+  padding-block: 1rem;
+}
+
+.fuel-summary h2,
+.destination-name {
+  margin: 0;
+  font-family: Bahnschrift, "DIN Condensed", "Arial Narrow", "Segoe UI", sans-serif;
+  font-weight: 600;
+}
+
+.fuel-summary h2 {
+  font-size: 1.25rem;
+}
+
+.fuel-note,
+.scan-hint {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.85rem;
+  line-height: 1.4;
+}
+
+.fuel-note {
+  margin-top: 0.2rem;
+}
+
+/* The fuel column: purple is within reach, pink is past the fuel line.
+   The fuel line starts under the 40 and continues through each row. */
+.fuel-limit,
+.destination-fuel {
+  position: relative;
+  background: linear-gradient(
+    to right,
+    rgb(144 70 255 / 0.15) var(--fuel-limit),
+    rgb(255 128 181 / 0.06) var(--fuel-limit)
+  );
+}
+
+.fuel-limit {
+  min-height: 5.25rem;
+}
+
+.axis-label {
+  position: absolute;
+  top: 0.65rem;
+  left: 0.75rem;
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+.fuel-tick {
+  position: absolute;
+  bottom: 0.4rem;
+  left: calc(var(--tick) / var(--fuel-scale) * 100%);
+  transform: translateX(-50%);
+  color: var(--muted);
+  font-size: 0.75rem;
+}
+
+.fuel-tick.fuel-tick-start {
+  transform: none;
+  margin-left: 0.75rem;
+}
+
+.fuel-limit::before,
+.destination-fuel::before {
+  content: "";
+  position: absolute;
+  z-index: 1;
+  left: var(--fuel-limit);
+  bottom: 0;
+  width: 2px;
+  margin-left: -1px;
+  background: var(--accent-text);
+}
+
+.fuel-limit::before {
+  top: 3.35rem;
+}
+
+.destination-fuel::before {
+  top: 0;
 }
 
 .fuel-gauge {
+  position: absolute;
+  top: 0.65rem;
+  left: var(--fuel-limit);
+  transform: translateX(-50%);
   display: flex;
   align-items: baseline;
-  gap: 0.4rem;
+  gap: 0.3rem;
+}
+
+.fuel-value,
+.fuel-required {
+  font-family: Bahnschrift, "DIN Condensed", "Arial Narrow", "Segoe UI", sans-serif;
+  font-weight: 700;
 }
 
 .fuel-value {
-  font-size: 2.4rem;
-  font-weight: 700;
-  color: var(--accent);
+  font-size: 2.5rem;
+  line-height: 1;
+  color: var(--accent-text);
 }
 
 .fuel-unit {
   color: var(--muted);
 }
 
-.fuel-note {
-  margin: 0.25rem 0 0;
-  color: var(--muted);
-  font-size: 0.85rem;
-}
-
 .scan-panel {
   display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 0.5rem;
+  align-items: center;
+  gap: 1.25rem;
+}
+
+.scan-hint {
+  max-width: 19rem;
+  text-align: right;
 }
 
 .scan-button {
+  flex: none;
   background: var(--accent);
-  color: #06233a;
+  color: #ffffff;
   border: none;
   border-radius: 8px;
   padding: 0.7rem 1.4rem;
@@ -108,112 +585,296 @@ body {
   filter: brightness(1.08);
 }
 
-.scan-hint {
-  margin: 0;
-  color: var(--muted);
-  font-size: 0.85rem;
+.scan-button:focus-visible,
+.launch-button:focus-visible {
+  outline: 2px solid var(--accent-text);
+  outline-offset: 2px;
 }
 
-.destinations {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-  gap: 1rem;
-}
-
+/* Rows. The divider is a shadow so it doesn't break the fuel line. */
 .destination-card {
-  background: var(--panel);
-  border: 1px solid var(--panel-border);
-  border-radius: 12px;
-  padding: 1.1rem 1.2rem;
+  margin-inline: calc(var(--plan-inset) * -1);
+  padding-inline: var(--plan-inset);
+  box-shadow: inset 0 1px 0 var(--panel-border);
+  transition: background-color 0.3s;
+}
+
+.destination-identity {
   display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
+  align-items: center;
+  gap: 0.85rem;
+}
+
+.planet {
+  flex: none;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  transition: filter 0.3s;
+}
+
+.planet-ember {
+  background: radial-gradient(circle at 35% 30%, var(--star-core), var(--warn) 22%, var(--danger) 60%, var(--panel-raised) 115%);
+}
+
+.planet-hollow {
+  background: radial-gradient(circle at 35% 30%, var(--ok), #5e8f73 45%, var(--panel-raised) 105%);
+}
+
+.planet-haven {
+  background: radial-gradient(circle at 35% 30%, #80f4ff, #0073bb 62%, var(--panel-raised) 120%);
 }
 
 .destination-name {
-  margin: 0;
-  font-size: 1.25rem;
+  font-size: 1.4rem;
+  line-height: 1.15;
 }
 
-.destination-stats {
+.destination-stat {
+  display: flex;
+  align-items: baseline;
+  gap: 0.4rem;
   margin: 0;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 0.5rem;
+  font-size: 0.85rem;
 }
 
-.destination-stats .stat {
+.destination-stat dt {
+  color: var(--muted);
+}
+
+.destination-stat dd {
+  margin: 0;
+  font-weight: 600;
+}
+
+.destination-stat dd.atmosphere-unsafe {
+  color: var(--warn);
+}
+
+/* Each fuel number sits at the end of its bar; the label is for screen readers */
+.destination-fuel {
   display: flex;
   flex-direction: column;
+  justify-content: center;
 }
 
-.destination-stats dt {
-  color: var(--muted);
-  font-size: 0.7rem;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
+.destination-fuel dt {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
 }
 
-.destination-stats dd {
-  margin: 0;
-  font-size: 1.1rem;
-  font-weight: 600;
+.destination-fuel .fuel-required {
+  position: absolute;
+  z-index: 2;
+  top: 50%;
+  left: calc(var(--fuel-required) / var(--fuel-scale) * 100% + 0.6rem);
+  transform: translateY(-50%);
+  font-size: 1.5rem;
+  line-height: 1;
+}
+
+.fuel-track {
+  position: relative;
+  height: 18px;
+}
+
+.fuel-bar {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: calc(var(--fuel-required) / var(--fuel-scale) * 100%);
+  border-radius: 0 3px 3px 0;
+  background: var(--bar-idle);
+  transform-origin: left;
+  transition: background-color 0.3s;
+}
+
+/* The part of the bar past the fuel line. Hollow and Haven have none. */
+.fuel-bar::after {
+  content: "";
+  position: absolute;
+  inset: 0 0 0 calc(var(--fuel-available) / var(--fuel-required) * 100%);
+  border-radius: inherit;
+  background: transparent;
+  transition: background-color 0.3s;
+}
+
+.destination-action {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0.6rem;
 }
 
 .destination-status {
   margin: 0;
-  padding: 0.5rem 0.75rem;
-  border-radius: 8px;
-  background: #0f1627;
-  border: 1px solid var(--panel-border);
+  color: var(--muted);
+  font-size: 0.95rem;
   font-weight: 600;
-  min-height: 1.2em;
 }
 
 /* Status variants (set via a status class, not color alone) */
+.destination-status::before {
+  margin-right: 0.4em;
+}
+
 .destination-status.status-ok {
-  border-color: var(--ok);
   color: var(--ok);
 }
 
 .destination-status.status-ok::before {
-  content: "\2713 "; /* check mark + text label stays readable */
+  content: "\2713"; /* check mark + text label stays readable */
 }
 
 .destination-status.status-warn {
-  border-color: var(--warn);
   color: var(--warn);
 }
 
 .destination-status.status-warn::before {
-  content: "\26A0 "; /* warning sign */
+  content: "\26A0"; /* warning sign */
 }
 
 .destination-status.status-danger {
-  border-color: var(--danger);
   color: var(--danger);
 }
 
 .destination-status.status-danger::before {
-  content: "\2715 "; /* cross mark */
+  content: "\2715"; /* cross mark */
+}
+
+/* After a scan, each row takes on the result of its status */
+.destination-card:has(.status-ok) {
+  background-color: rgb(128 255 181 / 0.07);
+}
+
+.destination-card:has(.status-ok) .fuel-bar {
+  background: var(--ok);
+}
+
+.destination-card:has(.status-warn) .fuel-bar {
+  background: var(--warn);
+}
+
+.destination-card:has(.status-danger) .fuel-bar::after {
+  background: var(--danger);
+}
+
+.destination-card:has(.status-warn) .planet,
+.destination-card:has(.status-danger) .planet {
+  filter: saturate(0.45) brightness(0.8);
+}
+
+/* Bars re-measure one after another when a scan result arrives */
+.destination-card:has(.status-ok) .fuel-bar,
+.destination-card:has(.status-warn) .fuel-bar,
+.destination-card:has(.status-danger) .fuel-bar {
+  animation: fuel-measure 0.55s cubic-bezier(0.2, 0.7, 0.2, 1) backwards;
+}
+
+.destination-card:nth-child(2) .fuel-bar {
+  animation-delay: 0.15s;
+}
+
+.destination-card:nth-child(3) .fuel-bar {
+  animation-delay: 0.3s;
+}
+
+@keyframes fuel-measure {
+  from {
+    transform: scaleX(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .destination-card .fuel-bar {
+    animation: none !important;
+  }
 }
 
 .launch-button {
+  width: 100%;
   background: var(--ok);
-  color: #04291a;
-  border: none;
+  color: var(--bg);
+  border: 1px solid var(--ok);
   border-radius: 8px;
-  padding: 0.6rem 1rem;
-  font-size: 0.95rem;
+  padding: 0.45rem 0.75rem;
+  font-size: 0.9rem;
   font-weight: 700;
   cursor: pointer;
-  margin-top: auto;
 }
 
+/* Locked launches stay quiet so Scan and the one safe launch stand out */
 .launch-button:disabled {
-  background: #1d2844;
+  background: transparent;
+  border-color: var(--panel-border);
   color: var(--muted);
+  font-weight: 600;
   cursor: not-allowed;
+}
+
+/* Very narrow phones: the label would run into the 40 */
+@media (max-width: 400px) {
+  .axis-label {
+    display: none;
+  }
+}
+
+/* Phones: each row stacks, and the fuel line stays with each bar */
+@media (max-width: 760px) {
+  .flight-plan {
+    --plan-inset: 1.25rem;
+  }
+
+  .flight-axis,
+  .destination-card {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .flight-toolbar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.9rem;
+  }
+
+  .scan-panel {
+    flex-direction: column-reverse;
+    align-items: stretch;
+    gap: 0.5rem;
+  }
+
+  .scan-hint {
+    max-width: none;
+    text-align: left;
+  }
+
+  .axis-heading {
+    display: none;
+  }
+
+  .destination-identity {
+    padding-bottom: 0.75rem;
+  }
+
+  .destination-fuel {
+    padding-block: 0.6rem;
+  }
+
+  .destination-action {
+    flex-direction: row;
+    align-items: center;
+    padding-top: 0.75rem;
+  }
+
+  .destination-action .destination-status {
+    flex: 1;
+  }
+
+  .destination-action .launch-button {
+    width: auto;
+  }
 }
 
 .success-panel {
@@ -221,7 +882,7 @@ body {
   text-align: center;
   padding: 2rem;
   border-radius: 12px;
-  background: linear-gradient(135deg, #0d3b2a, #0a2a44);
+  background: linear-gradient(135deg, var(--glow), var(--bg));
   border: 1px solid var(--ok);
 }
 
